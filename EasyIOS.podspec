@@ -1,14 +1,13 @@
 Pod::Spec.new do |s|
-  s.name                  = "EasyIOS"
-  s.version               = "2.2.1"
-  s.summary               = "EasyIOS is a MVVM frameWork base on AFNetworking and ReactiveCocoa"
-  s.homepage              = "http://easyios.08dream.com"
-  s.social_media_url      = "http://easyios.08dream.com"
-  s.platform     = :ios,'6.0'
-  s.license               = { :type => "MIT", :file => "LICENSE" }
-  s.author                = { "zhuchao" => "zhuchao@iosx.me" }
-  s.source                = { :git => "https://github.com/zhuchaowe/EasyIOS.git",:tag => "2.2.1" }
+  s.name         = "EasyIOS"
+  s.version      = "2.2.1"
+  s.summary      = "A new generation of development framework based on Model-View-ViewModel"
+  s.homepage     = "https://github.com/xiaojunbeyond/EasyIOS"
+  s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
+  s.author             = { "xiaojunbeyond" => "xiaojunkingwolf@aliyun.com" }
+  s.platform     = :ios, "6.0"
   s.ios.deployment_target = "6.0"
+  s.source       = { :git => "https://github.com/xiaojunbeyond/EasyIOS.git", :tag => "2.2.1" }
   s.requires_arc          = true
   s.framework             = "CoreFoundation","Foundation","CoreGraphics","Security","UIKit"
   s.library		= "z.1.1.3","stdc++","sqlite3"
