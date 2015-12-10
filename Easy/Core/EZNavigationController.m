@@ -16,38 +16,48 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    __weak EZNavigationController *weakSelf = self;
-    if ([self respondsToSelector:@selector(interactivePopGestureRecognizer)])
-    {
-        self.interactivePopGestureRecognizer.delegate = weakSelf;
-        self.delegate = weakSelf;
+
+    [self configGestureRecognizer];
+}
+
+
+- (void)configGestureRecognizer
+{
+    //系统侧滑功能的实现者
+    id target = self.interactivePopGestureRecognizer.delegate;
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:target action:@selector(handleNavigationTransition:)];
+    pan.delegate = self;
+    [self.view addGestureRecognizer:pan];
+    
+    //禁掉系统的侧滑手势
+    self.interactivePopGestureRecognizer.enabled = NO;
+    self.interactivePopGestureRecognizer.delegate = self;
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+//当手势发生时调用,返回NO拦截手势而不调用Action
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    BOOL result = NO;
+    if (gestureRecognizer == self.interactivePopGestureRecognizer) return result;
+    
+    if (self.viewControllers.count == 1) {
+        result = NO;
     }
-    // Do any additional setup after loading the view.
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated
-{
-    if ([self respondsToSelector:@selector(interactivePopGestureRecognizer)])
-        self.interactivePopGestureRecognizer.enabled = NO;
+    else if(self.popGestureRecognizerEnabled)
+    {
+        result = YES;
+    }
     
-    [super pushViewController:viewController animated:animated];
+    return result;
+    
 }
 
-#pragma mark UINavigationControllerDelegate
-
-- (void)navigationController:(UINavigationController *)navigationController
-       didShowViewController:(UIViewController *)viewController
-                    animated:(BOOL)animate
+- (void)dealloc
 {
-    // Enable the gesture again once the new controller is shown
-    
-    if ([self respondsToSelector:@selector(interactivePopGestureRecognizer)])
-        self.interactivePopGestureRecognizer.enabled = YES;
+    UIPanGestureRecognizer *pan = [self.view.gestureRecognizers firstObject];
+    pan.delegate = nil;
+    self.interactivePopGestureRecognizer.delegate = nil;
 }
 
 @end

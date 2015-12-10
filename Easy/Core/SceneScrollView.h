@@ -10,6 +10,14 @@
 
 @interface SceneScrollView : UIScrollView
 @property(nonatomic,strong)UIView *contentView;
-- (id)initAutoLayoutAddToView:(UIView *)superView;
+- (void)addContentView;
 - (void)endWithView:(UIView *)endview;
+-(void)addHorizontalContentView;
+-(void)addHorizontalSubView:(UIView *)view atIndex:(NSInteger)index;
+-(void)endWithHorizontalView:(UIView *)endview;
+
+
+- (void)horizontalConstrainTopSpaceToView:(UIView*)view predicate:(NSString*)predicate;
+- (void)horizontalAlignTopWithView:(UIView*)view predicate:(NSString*)predicate;
+- (void)horizontalAlignBottomWithView:(UIView*)view predicate:(NSString*)predicate;
 @end

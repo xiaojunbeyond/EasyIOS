@@ -52,9 +52,9 @@ static char UIScrollViewPullToRefreshView;
                     view.state = SVPullToRefreshStateLoading;
                 }else if(self.isDragging && pullNum < -SVPullToRefreshViewHeight  && view.state == SVPullToRefreshStatePulling)
                     view.state = SVPullToRefreshStateTriggered;
-                else if(pullNum <= 0 && pullNum > -SVPullToRefreshViewHeight){
+                else if(pullNum <= -1 && pullNum > -SVPullToRefreshViewHeight){
                     view.state = SVPullToRefreshStatePulling;
-                }else if(pullNum>0){
+                }else if(pullNum> -1){
                     view.state = SVPullToRefreshStateStopped;
                 }
             }
@@ -76,7 +76,7 @@ static char UIScrollViewPullToRefreshView;
         [self addSubview:self.pullToRefreshView];
     }
     if (customer == NO) {
-        PullHeader *header = [[PullHeader alloc]initWithFrame:CGRectMake(0, 0, self.width, SVPullToRefreshViewHeight) with:self];
+        PullHeader *header = [[PullHeader alloc]initWithScrollView:self];
         [self.pullToRefreshView setCustomView:header];
     }
 }
@@ -136,6 +136,7 @@ static char UIScrollViewPullToRefreshView;
 
 #pragma mark - Getters
 - (void)setCustomView:(UIView *)customView{
+    
     if (customView && [customView isKindOfClass:[UIView class]]) {
         for (UIView *view in self.subviews) {
             [view removeFromSuperview];

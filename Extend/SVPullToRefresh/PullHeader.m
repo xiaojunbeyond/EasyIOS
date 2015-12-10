@@ -10,10 +10,11 @@
 
 @implementation PullHeader
 
-- (id)initWithFrame:(CGRect)frame with:(UIScrollView *)scrollView
+- (id)initWithScrollView:(UIScrollView *)scrollView
 {
-    self = [super initWithFrame:frame with:scrollView];
+    self = [super initWithScrollView:scrollView];
     if (self) {
+        
         _arrowImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"arrow-down"]];
         _arrowImage.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
         [self addSubview:_arrowImage];
@@ -30,43 +31,36 @@
         
         [self loadAutoLayout];
         
-         [RACObserve(self.arrowImage, hidden) subscribeNext:^(NSNumber* hidden) {
-             if (hidden.boolValue) {
-                 self.activityView.hidden = NO;
-                 [self.activityView startAnimating];
-             }else{
-                 self.activityView.hidden = YES;
-                 [self.activityView stopAnimating];
-             }
-         }];
-        
         @weakify(self);
         [RACObserve(scrollView.pullToRefreshView, state) subscribeNext:^(id x) {
             @strongify(self);
-            
             [UIView animateWithDuration:0.25f animations:^{
                 switch (scrollView.pullToRefreshView.state) {
                  
                     case SVPullToRefreshStateStopped:
                         [self resetScrollViewContentInset:scrollView];
                         self.arrowImage.hidden = NO;
+                        [self.activityView stopAnimating];
                         self.statusLabel.text = @"下拉可以刷新";
                         self.arrowImage.transform = CGAffineTransformIdentity;
                         [self updateTimeLabel:[NSDate date]];
                         break;
                     case SVPullToRefreshStatePulling:
                         self.arrowImage.hidden = NO;
+                        [self.activityView stopAnimating];
                         self.statusLabel.text = @"下拉可以刷新";
                         self.arrowImage.transform = CGAffineTransformIdentity;
                         break;
                     case SVPullToRefreshStateTriggered:
                         self.arrowImage.hidden = NO;
+                        [self.activityView stopAnimating];
                         self.statusLabel.text = @"释放可以刷新";
                         self.arrowImage.transform = CGAffineTransformMakeRotation(M_PI);
                         break;
                     case SVPullToRefreshStateLoading:
                          [self setScrollViewContentInsetForLoading:scrollView];
                         self.arrowImage.hidden = YES;
+                        [self.activityView startAnimating];
                         self.statusLabel.text = @"正在刷新...";
                         break;
                 }
@@ -74,18 +68,17 @@
         }];
 
         
-        [RACObserve(self, alignInset)
-         subscribeNext:^(NSNumber* alignInset) {
-             CGFloat yOrigin =0;
-             if (alignInset.boolValue) {
-                 yOrigin = - SVPullToRefreshViewHeight;
-             }else{
-                 yOrigin = - scrollView.pullToRefreshView.originalTopInset -SVPullToRefreshViewHeight;
-             }
-             scrollView.pullToRefreshView.frame = CGRectMake(0, yOrigin, scrollView.superview.width, SVPullToRefreshViewHeight);
-         }];
+        [self setHeaderFrame:scrollView];
     }
     return self;
+}
+
+//这里的pullToRefreshView使用autolayout布局各种出问题，
+//暂时没有完美的解决方案，先用frame顶着，哪位大神看不下去了来改改？
+-(void)setHeaderFrame:(UIScrollView *)scrollView{
+    //yOrigin = - scrollView.pullToRefreshView.originalTopInset -SVPullToRefreshViewHeight;
+    self.frame = CGRectMake(0, 0, scrollView.superview.width, SVPullToRefreshViewHeight);
+    scrollView.pullToRefreshView.frame = CGRectMake(0, - SVPullToRefreshViewHeight, scrollView.superview.width, SVPullToRefreshViewHeight);
 }
 
 -(void)loadAutoLayout{

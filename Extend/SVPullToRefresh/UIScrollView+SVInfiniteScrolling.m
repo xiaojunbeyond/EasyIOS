@@ -50,7 +50,6 @@ UIEdgeInsets scrollViewOriginalContentInsets;
             if(view.state != SVInfiniteScrollingStateLoading && view.state !=SVInfiniteScrollingStateEnded && view.enabled && self.contentSize.height >0) {
                 CGFloat scrollViewContentHeight = self.contentSize.height;
                 CGFloat scrollOffsetThreshold = scrollViewContentHeight - self.bounds.size.height + view.extendBottom;
-                NSLog(@"%f,%f",self.contentOffset.y,scrollOffsetThreshold);
                 if(!self.isDragging && view.state == SVInfiniteScrollingStateTriggered)
                     view.state = SVInfiniteScrollingStateLoading;
                 else if(self.isDragging && view.state == SVInfiniteScrollingStatePulling && self.contentOffset.y - scrollOffsetThreshold > SVInfiniteScrollingViewHeight)
@@ -82,7 +81,7 @@ UIEdgeInsets scrollViewOriginalContentInsets;
     }
     
     if (customer == NO) {
-        PullFooter *infiniteView = [[PullFooter alloc] initWithFrame:CGRectMake(0, 0, self.width, SVInfiniteScrollingViewHeight)  with:self];
+        PullFooter *infiniteView = [[PullFooter alloc] initWithScrollView:self];
         [self.infiniteScrollingView setCustomView:infiniteView];
     }
 }

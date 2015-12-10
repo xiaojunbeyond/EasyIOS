@@ -9,8 +9,8 @@
 #import "Header.h"
 @implementation Header
 
-- (id)initWithFrame:(CGRect)frame with:(UIScrollView *)scrollView{
-    self = [super initWithFrame:frame];
+- (id)initWithScrollView:(UIScrollView *)scrollView{
+    self = [super init];
     if (self) {
         
     }
@@ -27,7 +27,7 @@
     
     CGFloat offset = MAX(SVPullToRefreshViewHeight, 0);
     UIEdgeInsets currentInsets = scrollView.contentInset;
-    currentInsets.top = MIN(offset, scrollView.pullToRefreshView.originalTopInset + scrollView.pullToRefreshView.bounds.size.height);
+    currentInsets.top = MAX(offset, scrollView.pullToRefreshView.originalTopInset + scrollView.pullToRefreshView.bounds.size.height);
     [self setScrollViewContentInset:currentInsets scrollView:scrollView];
 }
 

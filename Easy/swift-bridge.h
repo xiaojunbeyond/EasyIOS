@@ -22,6 +22,8 @@
 #import "SVPullToRefresh.h"
 #import "GCDObjC.h"
 #import "UIView+FLKAutoLayout.h"
+#import "UIView+EzGesture.h"
+#import "URLManager.h"
 
 #ifdef DEBUG
 #define EZLog(...) NSLog(__VA_ARGS__)

@@ -8,6 +8,14 @@
 
 #import "Request.h"
 #import <objc/runtime.h>
+
+NSString * const RequestStateSuccess = @"RequestDidSuccess";
+NSString * const RequestStateFailed = @"RequestDidFailed";
+NSString * const RequestStateSending = @"RequestDidSending";
+NSString * const RequestStateError = @"RequestDidError";
+NSString * const RequestStateCancle = @"RequestDidCancle";
+
+
 @implementation Request
 
 +(id)Request{
@@ -44,7 +52,10 @@
     self.HOST = @"";
     self.PATH = @"";
     self.METHOD = @"GET";
+    self.CONTENTTYPE = @"json";
     self.needCheckCode = YES;
+    self.params = [NSMutableDictionary dictionary];
+    self.isFirstRequest = YES;
     [self loadActive];
 }
 
@@ -69,15 +80,27 @@
     if(self.output == nil){
         return NO;
     }
-    return SuccessState == _state ? YES : NO;
+    return RequestStateSuccess == _state ? YES : NO;
 }
 - (BOOL)failed
 {
-    return FailState == _state || ErrorState == _state ? YES : NO;
+    return RequestStateFailed == _state || RequestStateError == _state ? YES : NO;
 }
 - (BOOL)sending
 {
-    return SendingState == _state ? YES : NO;
+    return RequestStateSending == _state ? YES : NO;
+}
+- (BOOL)cancled{
+    return RequestStateCancle == _state ? YES : NO;
+}
+
+- (void)cancle{
+    if(self.op.isNotEmpty && self.op.isExecuting){
+        [self.op cancel];
+        if(self.op.isCancelled){
+            self.state = RequestStateCancle;
+        }
+    }
 }
 
 +(NSString *)requestKey{
@@ -89,10 +112,15 @@
 
 -(NSMutableDictionary *)requestParams{
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    for (NSString *key in [self getPropertyList:[self class]]) {
-        if(![[self valueForKey:key] isKindOfClass:[NSNull class]] && [self valueForKey:key] !=nil){
-                [dict setObject:[self valueForKey:key] forKey:key];
+    NSArray *propertyList = [self getPropertyList:[self class]];
+    [propertyList each:^(NSString *key) {
+        NSObject *object = [self valueForKey:key];
+        if(object.isNotEmpty){
+            [dict setObject:[self valueForKey:key] forKey:key];
         }
+    }];
+    if (self.params.isNotEmpty) {
+        [dict addEntriesFromDictionary:self.params];
     }
     return dict;
 }
@@ -129,6 +157,12 @@
 
 -(NSString *)cacheKey{
     NSAssert(self.url.isNotEmpty, @"url is empty");
-    return self.url.absoluteString.MD5;
+    if([self.METHOD isEqualToString:@"GET"]){
+        return self.url.absoluteString.MD5;
+    }else if(self.requestParams.isNotEmpty){
+        return [NSString stringWithFormat:@"%@%@",self.url,[self.requestParams joinToPath]].MD5;
+    }else{
+        return [NSString stringWithFormat:@"%@",self.url].MD5;
+    }
 }
 @end
